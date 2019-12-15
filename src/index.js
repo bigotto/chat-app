@@ -35,6 +35,16 @@ io.on('connection', (socket) => {
         })
         callback()
     })
+    // Typing
+    socket.on('start-typing', typing => {
+        const user = getUser(socket.id)
+        socket.broadcast.to(user.room).emit('typing-message', { username: user.username, valid: true })
+    })
+
+    socket.on('stop-typing', typing => {
+        const user = getUser(socket.id)
+        socket.broadcast.to(user.room).emit('typing-message', { username: null, valid: false })
+    })
 
     // Mesage
     socket.on('sendMessage', (msg, callback) => {

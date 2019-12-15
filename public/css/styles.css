@@ -134,6 +134,9 @@ button:disabled {
 }
 
 /* Message Composition Styles */
+.typing__info {
+    display: flex;
+}
 
 .compose {
     display: flex;

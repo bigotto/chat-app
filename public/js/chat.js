@@ -6,6 +6,7 @@ const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 const $sendLocationButton = document.querySelector('#send-location')
 const $messages = document.querySelector('#messages')
+const $typing = document.querySelector('#typing')
 
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
@@ -33,7 +34,6 @@ const autoscroll = () => {
         $messages.scrollTop = $messages.scrollHeight
     }
 }
-
 socket.on('message', msg => {
     console.log(msg)
     const html = Mustache.render(messageTemplate, {
@@ -63,6 +63,30 @@ socket.on('roomData', ({ room, users }) => {
     })
     document.querySelector('#sidebar').innerHTML = html
 })
+
+var typing = false
+socket.on('typing-message', ({ username, valid }) => {
+    if (valid) {
+        $typing.textContent = `${username} is typing...`
+    }
+    else {
+        $typing.textContent = ''
+    }
+})
+
+$messageForm.addEventListener('keypress', function (e) {
+    var key = e.which || e.keyCode;
+    if (key !== 13 && typing == false) {
+        typing = true
+        socket.emit('start-typing', typing)
+        setTimeout(sendStopTyping, 400)
+    }
+})
+
+function sendStopTyping() {
+    typing = false
+    socket.emit('stop-typing', typing)
+}
 
 $messageForm.addEventListener('submit', (e) => {
     e.preventDefault()
